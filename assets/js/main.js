@@ -250,20 +250,74 @@ function initContactForm() {
   const form = document.getElementById('quickMessageForm');
   if (!form) return;
 
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const sender = document.getElementById('senderName')?.value.trim();
-    const message = document.getElementById('senderMessage')?.value.trim();
+  const btnMailApp = document.getElementById('btnSendMailApp');
+  const btnCopyDraft = document.getElementById('btnCopyDraft');
+
+  function getMessageDetails() {
+    const sender = document.getElementById('senderName')?.value.trim() || 'Recruiter / Hiring Team';
+    const email = document.getElementById('senderEmail')?.value.trim() || '';
+    const message = document.getElementById('senderMessage')?.value.trim() || '';
 
     if (!message) {
-      showToast('Please type a message before sending.');
-      return;
+      showToast('Please enter a message before sending.');
+      return null;
     }
 
-    const subject = encodeURIComponent(`Portfolio Inquiry from ${sender || 'Colleague / Recruiter'}`);
-    const body = encodeURIComponent(message);
-    window.location.href = `mailto:sanjaysr2902@gmail.com?subject=${subject}&body=${body}`;
-    showToast('Opening your default mail client...');
+    const subject = `Portfolio Inquiry from ${sender}`;
+    let body = message + '\n\n----------------------------\nFrom: ' + sender;
+    if (email) {
+      body += '\nReply-To Email: ' + email;
+    }
+
+    return { sender, email, message, subject, body };
+  }
+
+  // Primary action: Send via Gmail (Web)
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const details = getMessageDetails();
+    if (!details) return;
+
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=sanjaysr2902@gmail.com&su=${encodeURIComponent(details.subject)}&body=${encodeURIComponent(details.body)}`;
+    window.open(gmailUrl, '_blank');
+    showToast('Opening Gmail Compose in a new tab...');
   });
+
+  // Secondary action: Native desktop mail client (Apple Mail, Outlook)
+  if (btnMailApp) {
+    btnMailApp.addEventListener('click', (e) => {
+      e.preventDefault();
+      const details = getMessageDetails();
+      if (!details) return;
+
+      const mailtoUrl = `mailto:sanjaysr2902@gmail.com?subject=${encodeURIComponent(details.subject)}&body=${encodeURIComponent(details.body)}`;
+      window.location.href = mailtoUrl;
+      showToast('Opening desktop mail client...');
+    });
+  }
+
+  // Tertiary action: Copy draft to clipboard
+  if (btnCopyDraft) {
+    btnCopyDraft.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const details = getMessageDetails();
+      if (!details) return;
+
+      const fullDraft = `To: sanjaysr2902@gmail.com\nSubject: ${details.subject}\n\n${details.body}`;
+      try {
+        await navigator.clipboard.writeText(fullDraft);
+        showToast('Email draft copied to clipboard!');
+      } catch (err) {
+        // Fallback
+        const textarea = document.createElement('textarea');
+        textarea.value = fullDraft;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('Email draft copied to clipboard!');
+      }
+    });
+  }
 }
 

@@ -1292,6 +1292,18 @@ button {
   color: var(--accent-blue);
 }
 
+.form-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .form-row-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ==========================================================================
    FOOTER
    ========================================================================== */
