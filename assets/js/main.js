@@ -92,7 +92,7 @@ const DOC_REGISTRY = {
     title: 'Sanjay A — Professional Portrait',
     subtitle: 'Java Backend Developer · Kerala, India',
     imageSrc: 'assets/images/headshot.png',
-    docPdf: 'assets/docs/Sanjay_A_Resume.pdf',
+    docPdf: 'assets/docs/professional-resume.pdf',
     verification: 'High-definition original profile headshot',
     downloadName: 'Sanjay_A_Portrait.png'
   }
